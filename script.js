@@ -1,7 +1,4 @@
-```javascript
-/* ==========================
-   MENU UNDERTALE
-========================== */
+// ===== MENU =====
 
 const opcoes =
 document.querySelectorAll(".opcao");
@@ -16,9 +13,17 @@ const paginas = [
 
 let selecionado = 0;
 
-/* ==========================
-   CORAÇÃO DO MENU
-========================== */
+// ===== DIÁLOGOS =====
+
+const mensagens = [
+    "* Você está cheio de DETERMINAÇÃO.",
+    "* Abrindo o blog...",
+    "* Abrindo seus links...",
+    "* Carregando perfil...",
+    "* Informações do projeto."
+];
+
+// ===== MENU =====
 
 function atualizarMenu(){
 
@@ -42,18 +47,24 @@ function atualizarMenu(){
         opcoes[selecionado]
         .getBoundingClientRect();
 
+    const menu =
+        document.getElementById(
+            "menu"
+        )
+        .getBoundingClientRect();
+
     heart.style.left =
-        (rect.left - 30) + "px";
+        (rect.left - menu.left - 25)
+        + "px";
 
     heart.style.top =
-        rect.top + "px";
+        (rect.top - menu.top)
+        + "px";
 }
 
-/* ==========================
-   ABRIR PÁGINA
-========================== */
+// ===== ABRIR PÁGINA =====
 
-function abrirPagina(indice){
+function abrirPagina(id){
 
     document
     .querySelectorAll(".pagina")
@@ -64,63 +75,52 @@ function abrirPagina(indice){
     );
 
     document
-    .getElementById(
-            paginas[indice]
-    )
+    .getElementById(id)
     .classList.add(
-            "ativa"
-    );
-
-    localStorage.setItem(
-        "paginaAtual",
-        indice
+        "ativa"
     );
 }
 
-/* ==========================
-   DIÁLOGO UNDERTALE
-========================== */
+// ===== TEXTO LETRA POR LETRA =====
 
-let intervaloDialogo;
+let intervalo;
 
 function escrever(texto){
 
-    const caixa =
+    const dialogo =
         document.getElementById(
             "dialogo"
         );
 
     clearInterval(
-        intervaloDialogo
+        intervalo
     );
 
-    caixa.textContent = "";
+    dialogo.textContent = "";
 
     let i = 0;
 
-    intervaloDialogo =
-        setInterval(() => {
+    intervalo =
+    setInterval(() => {
 
         if(i >= texto.length){
 
             clearInterval(
-                intervaloDialogo
+                intervalo
             );
 
             return;
         }
 
-        caixa.textContent +=
+        dialogo.textContent +=
             texto[i];
 
         i++;
 
-    }, 30);
+    }, 25);
 }
 
-/* ==========================
-   TECLADO
-========================== */
+// ===== TECLAS =====
 
 document.addEventListener(
 "keydown",
@@ -154,33 +154,22 @@ document.addEventListener(
             selecionado < 0
         ){
             selecionado =
-                opcoes.length - 1;
+            opcoes.length - 1;
         }
 
         atualizarMenu();
     }
 
     if(
-        e.key === "Enter"
+        e.key ===
+        "Enter"
     ){
 
         abrirPagina(
-            selecionado
+            paginas[
+                selecionado
+            ]
         );
-
-        const mensagens = [
-
-"* Você está cheio de DETERMINAÇÃO.",
-
-"* Abrindo o blog...",
-
-"* Abrindo seus links...",
-
-"* Carregando perfil...",
-
-"* Informações do projeto."
-
-        ];
 
         escrever(
             mensagens[
@@ -191,9 +180,7 @@ document.addEventListener(
 
 });
 
-/* ==========================
-   BLOG
-========================== */
+// ===== BLOG =====
 
 function publicarPost(){
 
@@ -214,31 +201,27 @@ function publicarPost(){
         .trim();
 
     if(
-        !titulo ||
-        !texto
+        titulo === "" ||
+        texto === ""
     ){
         return;
     }
 
     const posts =
         JSON.parse(
-            localStorage
-            .getItem(
+            localStorage.getItem(
                 "posts"
             ) || "[]"
         );
 
     posts.unshift({
 
-        titulo:
-            titulo,
-
-        texto:
-            texto,
+        titulo,
+        texto,
 
         data:
-            new Date()
-            .toLocaleString()
+        new Date()
+        .toLocaleString()
 
     });
 
@@ -268,16 +251,13 @@ function publicarPost(){
     );
 }
 
-/* ==========================
-   EXCLUIR POST
-========================== */
+// ===== EXCLUIR =====
 
 function excluirPost(indice){
 
     const posts =
         JSON.parse(
-            localStorage
-            .getItem(
+            localStorage.getItem(
                 "posts"
             ) || "[]"
         );
@@ -301,22 +281,18 @@ function excluirPost(indice){
     );
 }
 
-/* ==========================
-   CARREGAR POSTS
-========================== */
+// ===== CARREGAR POSTS =====
 
 function carregarPosts(){
 
     const area =
-        document
-        .getElementById(
+        document.getElementById(
             "posts"
         );
 
     const posts =
         JSON.parse(
-            localStorage
-            .getItem(
+            localStorage.getItem(
                 "posts"
             ) || "[]"
         );
@@ -324,74 +300,45 @@ function carregarPosts(){
     area.innerHTML = "";
 
     posts.forEach(
-        (
-            post,
-            indice
-        ) => {
+    (post, indice)=>{
 
         area.innerHTML += `
-<div class="post">
+        <div class="post">
 
-<h3>${post.titulo}</h3>
+            <h3>${post.titulo}</h3>
 
-<small>
-${post.data}
-</small>
+            <small>
+                ${post.data}
+            </small>
 
-<p>
-${post.texto}
-</p>
+            <p>
+                ${post.texto}
+            </p>
 
-<button
-onclick="
-excluirPost(
-${indice}
-)
-">
-EXCLUIR
-</button>
+            <button
+            onclick="
+            excluirPost(${indice})
+            ">
+            EXCLUIR
+            </button>
 
-</div>
-`;
+        </div>
+        `;
 
     });
 
 }
 
-/* ==========================
-   INICIALIZAÇÃO
-========================== */
+// ===== INICIAR =====
 
 window.onload = () => {
 
     carregarPosts();
 
-    const paginaSalva =
-        parseInt(
-            localStorage
-            .getItem(
-                "paginaAtual"
-            )
-        );
-
-    if(
-        !isNaN(
-            paginaSalva
-        )
-    ){
-
-        selecionado =
-            paginaSalva;
-
-        abrirPagina(
-            paginaSalva
-        );
-    }
-
     atualizarMenu();
 
     escrever(
-"* Bem-vindo ao Subsolo."
+        "* Bem-vindo ao Subsolo."
     );
+
 };
-```
